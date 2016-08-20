@@ -1,12 +1,12 @@
 resources:
-- name: source
+- name: hello-from
   type: git
   source:
     uri: {{github-uri}}
     branch: master
     private_key: {{github-private-key}}
 
-- name: image
+- name: hello-from-image
   type: docker-image
   source: 
     repository: richardkdrew/hello-from
@@ -24,7 +24,7 @@ jobs:
   public: true
   plan:
   - aggregate:
-    - get: source
+    - get: hello-from
       trigger: true
     - get: go-image
       params: {save: true}
@@ -39,7 +39,10 @@ jobs:
           version: 1.6
 
       inputs:
-       - name: source
+       - name: hello-from
+
+      outputs:
+       - name: app
 
       run:
         path: bash
@@ -48,13 +51,18 @@ jobs:
         - |
           set -e -x
           
-          workingFolder=$PWD/source
+          workingFolder=$PWD/hello-from
+          output=$PWD/app
 
           export GOOS=linux GOARCH=amd64
 
+          cd $workingFolder
+
           go build hello-from.go
-  - put: image
-  params: 
-    build: source
-    load_base: go-image
-    tag_as_latest: true    
+
+          cp $workingFolder/hello-from $workingFolder/Dockerfile $output
+  - put: hello-from-image
+    params: 
+      build: app
+      load_base: go-image
+      tag_as_latest: true    
