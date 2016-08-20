@@ -1,0 +1,100 @@
+resources:
+- name: source
+  type: git
+  source:
+    uri: {{github-uri}}
+    branch: master
+    private_key: {{github-private-key}}
+
+- name: image
+  type: docker-image
+  source: 
+    repository: richardkdrew/hello-from
+    username: {{dockerhub-user}}
+    password: {{dockerhub-password}}
+
+- name: dotnet-image
+  type: docker-image
+  source:
+    repository: golang
+    tag: '1.6'
+
+jobs:
+- name: build
+  public: true
+  plan:
+  - aggregate:
+    - get: source
+      trigger: true
+    - get: go-image
+      params: {save: true}
+  - task: build
+    # file: source/ci/tasks/build.yml
+    config:
+      platform: linux
+
+      image_resource:
+        type: docker-image
+        source:
+          repository: golang
+          version: 1.6
+
+      inputs:
+       - name: source
+
+      run:
+        path: bash
+        args:
+        - -c
+        - |
+          set -e -x
+          
+          workingFolder=$PWD/source
+
+          export GOOS=linux GOARCH=amd64
+
+          go build hello-from.go
+    - put: image
+    params: 
+      build: source
+      load_base: go-image
+      tag_as_latest: true    
+# - name: docker
+#   public: true
+#   plan:
+#   - aggregate:
+#     - get: source
+#       trigger: true
+#     - get: go-image
+#       params: {save: true}
+#       trigger: true
+#   # - task: create-context
+#   #   # file: source/ci/tasks/create-context.yml
+#   #   config:
+#   #     platform: linux
+
+#   #     image_resource:
+#   #       type: docker-image
+#   #       source:
+#   #         repository: ubuntu
+
+#   #     inputs:
+#   #       - name: source
+
+#   #     outputs:
+#   #       - name: docker-build-context
+
+#   #     run:
+#   #       path: bash
+#   #       args:
+#   #       - -c
+#   #       - |
+#   #         set -e -x
+
+#   #         output=$PWD/docker-build-context
+#   #         cd $output
+#   - put: image
+#     params: 
+#       build: source
+#       load_base: go-image
+#       tag_as_latest: true    
