@@ -29,7 +29,6 @@ jobs:
     - get: go-image
       params: {save: true}
   - task: build
-    # file: source/ci/tasks/build.yml
     config:
       platform: linux
 
@@ -59,42 +58,3 @@ jobs:
       build: source
       load_base: go-image
       tag_as_latest: true    
-# - name: docker
-#   public: true
-#   plan:
-#   - aggregate:
-#     - get: source
-#       trigger: true
-#     - get: go-image
-#       params: {save: true}
-#       trigger: true
-#   # - task: create-context
-#   #   # file: source/ci/tasks/create-context.yml
-#   #   config:
-#   #     platform: linux
-
-#   #     image_resource:
-#   #       type: docker-image
-#   #       source:
-#   #         repository: ubuntu
-
-#   #     inputs:
-#   #       - name: source
-
-#   #     outputs:
-#   #       - name: docker-build-context
-
-#   #     run:
-#   #       path: bash
-#   #       args:
-#   #       - -c
-#   #       - |
-#   #         set -e -x
-
-#   #         output=$PWD/docker-build-context
-#   #         cd $output
-#   - put: image
-#     params: 
-#       build: source
-#       load_base: go-image
-#       tag_as_latest: true    
