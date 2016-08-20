@@ -13,7 +13,7 @@ resources:
     username: {{dockerhub-user}}
     password: {{dockerhub-password}}
 
-- name: dotnet-image
+- name: go-image
   type: docker-image
   source:
     repository: golang
