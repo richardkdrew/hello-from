@@ -53,8 +53,8 @@ jobs:
           export GOOS=linux GOARCH=amd64
 
           go build hello-from.go
-    - put: image
-    params: 
-      build: source
-      load_base: go-image
-      tag_as_latest: true    
+  - put: image
+  params: 
+    build: source
+    load_base: go-image
+    tag_as_latest: true    
